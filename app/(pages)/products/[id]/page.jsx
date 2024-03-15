@@ -5,9 +5,23 @@ import React, { useEffect, useState } from 'react';
 import { GET_PRODUCTS } from '@/apollo/client/query';
 import { useQuery } from '@apollo/client';
 import Button from '@/app/_components/button';
+import { useRouter } from 'next/navigation';
+
 
 const Product = ({ params }) => {
     console.log("params----- :", params.id);
+    const router = useRouter()
+
+    const qtyData = JSON.parse(localStorage.getItem('cartData')) || []
+    console.log("🚀 ~ Product ~ qtyData:", qtyData)
+    let qtyItemIndex;
+
+
+    if (qtyData.length > 0) {
+        qtyItemIndex = qtyData.findIndex(
+            (item) => item.id === params.id
+        )
+    }
 
     const [qty, setQty] = useState(1);
 
@@ -19,54 +33,68 @@ const Product = ({ params }) => {
         setQty(prev => prev > 1 ? prev - 1 : 1);
     }
 
-    const [color, setColor] = useState(null);
 
     const { data, loading } = useQuery(GET_PRODUCTS, {
         variables: {
             id: params.id
         }
     });
+    console.log("ddddddddddddddddddd",data)
+
+    const [color, setColor] = useState(null);
+    console.log("🚀 ~ Product ~ color:", color)
 
     const addToCart = () => {
         const existingData = localStorage.getItem('cartData');
 
-        let newData = {
+        const newItem = {
             id: params.id,
             name: data.getProduct.name,
-            color: "",
-            image: data.getProduct.image[0],
+            color,
+            image: data.getProduct.images[0],
             price: data.getProduct.price,
-            qty
-        }
+            qty,
+        };
 
         if (existingData) {
             const parsedData = JSON.parse(existingData);
 
-            const updatedData = [...parsedData, newData];
-            localStorage.setItem('cartData', JSON.stringify(updatedData));
-        } else {
+            const existingItemIndex = parsedData.findIndex(
+                (item) => item.id === newItem.id && item.color._id === newItem.color._id
+            );
 
-            const initialData = [newData];
+            if (existingItemIndex !== -1) {
+                parsedData[existingItemIndex].qty = newItem.qty;
+            } else {
+                parsedData.push(newItem);
+            }
+
+            localStorage.setItem('cartData', JSON.stringify(parsedData));
+        } else {
+            const initialData = [newItem];
             localStorage.setItem('cartData', JSON.stringify(initialData));
         }
-    }
 
+        router.push('/cart')
+    };
 
     const [heroImg, setHeroImg] = useState(null);
 
     useEffect(() => {
         if (data && data.getProduct && data.getProduct.image && data.getProduct.image.length > 0) {
-            setHeroImg(data.getProduct.image[0]);
+            setColor(data.getProduct.colors[0])
+            setHeroImg(data.getProduct.image[0])
         }
     }, [data]);
 
     return (
         <div className='flex justify-center'>
             <div className='p-8'>
-                { loading && <h1>Loading...</h1>}
+                <Button className={"mb-4"} onClick={() => router.back()} title={"BACK TO PRODUCTS"} />
+                {loading && <h1>Loading...</h1>}
                 {heroImg && (
-                    <div className='max-h-[400px] w-auto relative overflow-hidden'>
-                        <Image src={heroImg}  width={600} height={320} className='h-full w-auto' />
+                    <div className='max-h-[400px] w-auto mt-4 relative overflow-hidden'>
+                        <Image src={heroImg} width={600} height={320} alt="Image" className='h-full w-auto' />
                     </div>
                 )}
 
@@ -85,10 +113,10 @@ const Product = ({ params }) => {
                         ))}
                 </div>
             </div>
-            <div className='p-8 w-full md:w-1/2'>
+            <div className='p-8 w-full md:w-1/2 mt-12'>
                 <h1 className='text-4xl font-bold mb-4'>{data?.getProduct?.name}</h1>
                 <h2 className='text-xl font-bold text-amber-700 mb-6'>$ {data?.getProduct?.price}</h2>
-                <p className='text-gray-700 mb-6 leading-loose'>{data?.getProduct?.description}</p>
+                <p className='text-white-700 mb-6 leading-loose'>{data?.getProduct?.description}</p>
 
                 <div className='flex flex-col md:flex-row md:justify-between mb-6'>
                     <div className='flex-1 md:w-1/2'>
@@ -112,8 +140,17 @@ const Product = ({ params }) => {
                 <hr className='my-8' />
 
                 <div className='flex flex-col md:flex-row md:justify-between'>
-                    <div className='flex-1 md:w-1/2'>
-                        <h3 className='text-lg font-bold mb-2'>Colors :</h3>
+                    <div className='flex md:w-1/2'>
+                        <div className='flex gap-2 items-center'>
+                            <h3 className='text-lg font-bold'>Colors :</h3>
+                            {data?.getProduct?.colors?.map((itemColor) => (
+                                <div
+                                    onClick={() => setColor(itemColor)}
+                                    key={itemColor._id}
+                                    style={{ width: '20px', height: '20px', backgroundColor: itemColor.hexCode, borderRadius: '50%', padding: '10px' }}>
+                                </div>
+                            ))}
+                        </div>
                         <p>{data?.getProduct?.color?.name}</p>
                     </div>
                 </div>

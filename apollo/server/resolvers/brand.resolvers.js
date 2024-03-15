@@ -15,7 +15,11 @@ const getAllBrand = async () => {
 
 const addBrand = async (_, args) => {
     try {
-        const { name } = args
+        const { name } = args;
+
+        const existBrand = await brand.find({name})
+        if (existBrand) return new Error("Brand Is alredy Created")
+
         const brandData = await brand.create({name})
         if (!brandData) return new Error("Brand Is NOT Creating")
         console.log("🚀 ~ addBrand ~ brandData:", brandData)

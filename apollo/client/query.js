@@ -20,11 +20,11 @@ export const GET_ALL_PRODUCTS = gql`
       name
     }
     sku
-    # colors {
-    #   _id
-    #   name
-    #   hexCode
-    # }
+    colors {
+      _id
+      name
+      hexCode
+    }
     image
     freeShipping
    }
@@ -49,11 +49,11 @@ query GetProduct($id: ID) {
       name
     }
     sku
-    # colors {
-    #   _id
-    #   name
-    #   hexCode
-    # }
+    colors {
+      _id
+      name
+      hexCode
+    }
     image
     freeShipping
   }

@@ -8,10 +8,9 @@ const getAllProduct = async () => {
             .populate([
                 { path: "brand", select: "name" },
                 { path: "category", select: "name" },
-                // { path: "color", select: "name" }
+                { path: "colors", select: "name hexCode"}
             ]);
         if (!productData) return new Error("Products Is NOT Define");
-        console.lo);
         return productData
     } catch (error) {
         console.log("🚀 ~ getAllProduct ~ getAllProduct:", error.message);
@@ -26,7 +25,7 @@ const getProduct = async (_, args) => {
             .populate([
                 { path: "brand", select: "name" },
                 { path: "category", select: "name" },
-                // { path: "color", select: "name" }
+                { path: "colors", select: "name hexCode" }
             ]);
         if (!productData) return new Error("Product is not defined");
         console.log("🚀 ~ getProduct ~ productData:", productData);

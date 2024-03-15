@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react';
+import SideBar from '@/app/_components/sideBar'
 import ProductCard from '@/app/_components/productCard';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_PRODUCTS } from '@/apollo/client/query';
@@ -14,17 +15,20 @@ const Page = () => {
 
   return (
     <>
-    <div className='flex gap-8'>
-      {data ?
-        data.getAllProduct &&
-        data.getAllProduct.map((product) => (
-          <Link href={`/products/` + product?._id}>
-            <ProductCard product={product} />
-          </Link>
-        ))
-        :
-        <h1>Loading...</h1>}
+      <div className="flex justify-center">
+        <SideBar />
+        <div className='flex gap-8'>
+          {data ?
+            data.getAllProduct &&
+            data.getAllProduct.map((product) => (
+              <Link href={`/products/` + product?._id}>
+                <ProductCard product={product} />
+              </Link>
+            ))
+            :
+            <h1>Loading...</h1>}
         </div>
+      </div>
     </>
   );
 }
