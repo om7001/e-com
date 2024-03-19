@@ -9,7 +9,7 @@ const order = gql`
   }
 
   type OrderProduct {
-    pid: ID!
+    pid: product
     qty: Int!
     color: color
   }

@@ -8,7 +8,7 @@ const wishlist = gql`
   }
 
   type Query {
-    getWishlist: Wishlist
+    getWishlist(userId: ID!): Wishlist
   }
 
   type Mutation {

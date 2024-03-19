@@ -5,52 +5,52 @@ import { isAuthenticated } from '@/apollo/server/middleware';
 
 
 const login = async (_, { input }) => {
-        const { email, password } = input;
-        try {
-            const userData = await user.findOne({ email });
-            console.log("🚀 ~ login ~ userData:", userData);
-            if (!userData) throw new Error("Wrong email or password");
+    const { email, password } = input;
+    try {
+        const userData = await user.findOne({ email });
+        console.log("🚀 ~ login ~ userData:", userData);
+        if (!userData) throw new Error("Wrong email or password");
 
-            const isMatch = await userData.isPasswordCorrect(password);
-            if (!isMatch) throw new Error("Wrong email or password");
+        const isMatch = await userData.isPasswordCorrect(password);
+        if (!isMatch) throw new Error("Wrong email or password");
 
-            const accessToken = await userData.generateAccessToken();
-            console.log("🚀 ~ login ~ accessToken:", accessToken);
+        const accessToken = await userData.generateAccessToken();
+        console.log("🚀 ~ login ~ accessToken:", accessToken);
 
-            userData.accessToken = accessToken;
-            return userData;
-        } catch (error) {
-            console.log(error);
-            return {
-                message: "User login failed",
-                error: error.message
-            };
-        }
-    };
+        userData.accessToken = accessToken;
+        return userData;
+    } catch (error) {
+        console.log(error);
+        return {
+            message: "User login failed",
+            error: error.message
+        };
+    }
+};
 
 
 const createUser = async (_, { input }) => {
-        try {
-            console.log("🚀 ~ createUser ~ input:", input.email)
+    try {
+        console.log("🚀 ~ createUser ~ input:", input.email)
 
-            const isExistingUser = await user.findOne({ email: input.email });
-            if (isExistingUser) {
-                return new Error("Email is already in use");
-            }
-
-            // input.role = await Role.findOne({ name: "user" }).select("_id");
-            const userData = await user.create(input);
-            if (!userData) {
-                return new Error("Failed to create user");
-            }
-            console.log("🚀 ~ createUser ~ user:", userData)
-
-            return "User created successfully";
-        } catch (error) {
-            console.error("Failed to create user:", error.message);
-            return new Error("Failed to create user. Please try again later.");
+        const isExistingUser = await user.findOne({ email: input.email });
+        if (isExistingUser) {
+            return new Error("Email is already in use");
         }
-    };
+
+        // input.role = await Role.findOne({ name: "user" }).select("_id");
+        const userData = await user.create(input);
+        if (!userData) {
+            return new Error("Failed to create user");
+        }
+        console.log("🚀 ~ createUser ~ user:", userData)
+
+        return "User created successfully";
+    } catch (error) {
+        console.error("Failed to create user:", error.message);
+        return new Error("Failed to create user. Please try again later.");
+    }
+};
 
 const getUsers = combineResolvers(
     isAuthenticated,
@@ -59,7 +59,7 @@ const getUsers = combineResolvers(
             const userData = await user.find()
             // .populate("order").populate("cart").populate("wishlist");
             if (!userData) {
-                throw new Error("User not found");
+                return new Error("User not found");
             }
             return userData;
         } catch (error) {
@@ -73,8 +73,13 @@ const getUserById = combineResolvers(
     isAuthenticated,
     async (_, { _id }) => {
         try {
-            const userData = await user.findById(_id)
-            // .populate("order").populate("cart").populate("wishlist");
+            const userData = await user.findById({_id})
+                .populate([
+                    { path: "orders" },
+                    { path: "cart" },
+                    { path: "wishlist" }
+                ]);
+            console.log("🚀 ~ userData:", userData)
             if (!userData) {
                 throw new Error("User not found");
             }

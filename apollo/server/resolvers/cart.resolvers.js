@@ -6,10 +6,10 @@ const getCartByUserId = combineResolvers(
     isAuthenticated,
     async (_, { userId }) => {
         try {
-            const cartData = await cart.findOne({ user: userId }).populate({
-                path: "products.pid",
-                populate: { path: "color" }
-            }).populate("user");
+            const cartData = await cart.findOne({ user: userId })
+                .populate([{
+                    path: "products",
+                }])
             return cartData;
         } catch (error) {
             console.error("Error fetching cart:", error);

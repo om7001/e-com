@@ -2,42 +2,50 @@ import { order } from "@/lib/models";
 import { combineResolvers } from "graphql-resolvers";
 import { isAuthenticated } from "@/apollo/server/middleware"
 
-const getOrderByUserId = combineResolvers(
-    isAuthenticated,
-    async (_, { userId }) => {
-        try {
-            const orderData = await order.findOne({ user: userId })
-            // .populate({
-            //     path: "order",
-            //     // populate: { path: "color" }
-            // })
-            // .populate("user");
-            return orderData;
-        } catch (error) {
-            console.error("Error fetching order:", error);
-            throw new Error("Failed to fetch order");
-        }
-    });
-
-const getAllOrders = combineResolvers(
-    isAuthenticated,
-    async () => {
-        try {
-            const orderData = await order.find()
-                .populate({
-                    path: 'products.pid',
-                    // populate: { path: 'color' }
-                })
-            // .populate('user');
-            if (!orderData) {
-                return new Error("Orders Is NOT Define");
+const getOrderByUserId =
+    combineResolvers(
+        isAuthenticated,
+        async (_, { userId }) => {
+            try {
+                const orderData = await order.findOne({ user: userId })
+                    .populate([
+                        { path: "products", populate: { path: "pid", select: "_id" } },
+                        { path: "products", populate: { path: "color", select: "_id" } },
+                        { path: "user" }
+                    ])
+                console.log("🚀 ~ orderData:", orderData)
+                if (!orderData) {
+                    return new Error("Orders Is NOT Define");
+                }
+                return orderData;
+            } catch (error) {
+                console.error("Error fetching order:", error);
+                return new Error("Failed to fetch order");
             }
-            return orderData;
-        } catch (error) {
-            console.error("Error fetching all orders:", error);
-            return new Error("Failed to fetch orders");
         }
-    });
+    );
+
+const getAllOrders =
+    combineResolvers(
+        isAuthenticated,
+        async () => {
+            try {
+                const orderData = await order.find()
+                    .populate([
+                        { path: "products", populate: { path: "pid", select: "_id" } },
+                        { path: "products", populate: { path: "color", select: "_id" } },
+                        { path: "user" }
+                    ])
+                if (!orderData) {
+                    return new Error("Orders Is NOT Define");
+                }
+                return orderData;
+            } catch (error) {
+                console.error("Error fetching all orders:", error);
+                return new Error("Failed to fetch orders");
+            }
+        }
+    );
 
 const createOrder = combineResolvers(
     isAuthenticated,

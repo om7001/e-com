@@ -3,10 +3,10 @@ import { user } from '@/lib/models';
 
 // Auth
 const isAuthenticated = async (_, args, {users}) => {
-    console.log("🚀 ~ isAuthenticated ~ users:", users)
+    // console.log("🚀 ~ isAuthenticated ~ users:", users)
     try {
         const userData = await user.findById(users._id, { password: 0 });
-        console.log("🚀 ~ isAuthenticated ~ userData:", userData)
+        // console.log("🚀 ~ isAuthenticated ~ userData:", userData)
         if (!userData) {
             return new Error('Not authenticated1');
         }
