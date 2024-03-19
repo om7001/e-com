@@ -12,6 +12,8 @@ const brands = gql`
 
   type Mutation{
     addBrand(name: String):brand
+    updateBrand(_id: ID!, name: String!): brand
+    deleteBrand(_id: ID!): String
   }
 `
 export default brands

@@ -32,7 +32,7 @@ const order = gql`
   }
 
   type Mutation {
-    createOrder(input: CreateOrderInput!): Order!
+    createOrder(input: CreateOrderInput!): String
   }
   
 `;

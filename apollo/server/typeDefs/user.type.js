@@ -33,13 +33,24 @@ const user = gql`
     role: String
   }
 
+  input login{
+    email: String!
+    password: String!
+  }
+
+  type loginResult{
+    email: String
+    accessToken: String
+  }
+
   type Query {
-    getUsers: [User!]!
+    getUsers: [User]
     getUserById(_id: ID!): User
   }
 
   type Mutation {
-    createUser(input: CreateUserInput!): User!
+    login(input: login!): loginResult
+    createUser(input: CreateUserInput!): String
     updateUser(input: UpdateUserInput!): User
     deleteUser(_id: ID!): User
   }

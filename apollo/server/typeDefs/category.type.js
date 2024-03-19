@@ -12,6 +12,8 @@ const categorys = gql`
 
   type Mutation{
     addCategory(name: String):category
+    updateCategory(_id: ID!, name: String!): category
+    deleteCategory(_id: ID!): String
   }
 `
 export default categorys
